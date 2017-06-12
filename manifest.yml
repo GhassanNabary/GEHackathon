@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: predix-microservice-cf-jsr
+  - name: 25-team-be
     buildpack: java_buildpack
     path: target/predix-microservice-cf-jsr-1.1.21.jar
     memory: 384M
