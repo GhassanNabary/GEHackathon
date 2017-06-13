@@ -1,5 +1,6 @@
 package com.ge.predix.solsvc.boot;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,18 +50,43 @@ public class TsController {
 		
 	}
 	@RequestMapping(value = "/chargingPointInfo", produces="application/json")
-	public JSONObject getChargingPointInfo(@ModelAttribute("tag") String tag){
+	public JSONObject getChargingPointInfo(@ModelAttribute("tag") String asset){
 		JSONObject result = new JSONObject();
 		JSONObject response = new JSONObject();
 		JSONObject body = new JSONObject();
-/*		result.put("name", "");
-		result.put("isAvailable", "");
-		result.put("location", "");*/
 		JSONArray tags = new JSONArray();
 		JSONObject tagjs = new JSONObject();
-		tagjs.put("name", tag);
+		tagjs.put("name", asset);
 		tags.add(tagjs);
-		body.put("tags", tags);
+		List ports = getPorts(asset);
+		int portsNum = ports.size();
+		int availablePorts = ports.size();
+		int energeyConsumption = -1;
+		for (String port : ports) {
+			energeyConsumption = getTagValue(port);
+			if(energeyConsumption == 0){
+				availablePorts--;
+			}
+		}
+		result.put("availablePorts", availablePorts+"/"+portsNum);
+		if(availablePorts == portsNum){
+			result.put("isAvailable", "false");
+		}
+		else{
+			result.put("isAvailable", "true");
+		}
+		result.put("location", "10,12");
+		
+		return result;
+		
+	}
+	
+	
+	public int getTagValue(String tag) throws Exception{
+		JSONObject response = new JSONObject();
+		JSONObject result = new JSONObject();
+		JSONObject body = new JSONObject();
+		body.put("tags", tag);
 		System.out.println("body "+body.toJSONString());
 		try {
 			HttpHeaders headers = new HttpHeaders();
@@ -73,10 +99,16 @@ public class TsController {
 		catch (Exception e) {
 			System.out.println("Exception: "+ e.getMessage());
 		}
-		response.get("values");
-		
-		return result;
-		
+		if(((ArrayList) response.get("tags")) ==null){
+			throw new Exception("has no value");
+		}
+		LinkedHashMap map = (LinkedHashMap) ((ArrayList) response.get("tags")).get(0);
+		System.out.println(map);
+		LinkedHashMap json = (LinkedHashMap) ((ArrayList) map.get("results")).get(0);
+		System.out.println(json);
+		ArrayList values = (ArrayList) ((ArrayList) json.get("values")).get(0);
+		int energeyConsumption = (int)values.get(1);
+		return energeyConsumption;
 	}
 	
 /*	public String getValueFromLatest(JSONObject obj){
