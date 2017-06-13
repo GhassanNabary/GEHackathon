@@ -1,0 +1,107 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/px-view-header/px-view-header.html">
+<link rel="import" href="../../bower_components/px-card/px-card.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/marked-element/marked-element.html">
+<link rel="import" href="../../bower_components/px-dropdown/px-dropdown.html">
+<link rel="import" href="../../bower_components/px-dropdown/px-dropdown-content.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="info-view">
+
+  <template>
+    <px-card id="myCard" header-text="Charging stations dashboard">
+      <style is="custom-style">
+        div.markdown-html > h2 {
+          margin-top: 0;
+        }
+      </style>
+      <div>
+        <marked-element id="aboutContentMarkdown" markdown="">
+          <div class="markdown-html">
+
+
+          </div>
+        </marked-element>      </div>
+    </px-card>
+  
+
+
+       <px-dropdown id="Dropdown"
+      display-value="Charging stations"
+      style="position: absolute; top: 10px; right: 50px; width: 350px; padding-right: 15px">
+      <px-dropdown-content extend-dropdown='true' extend-dropdown-by='25' max-cont-character-width='10'
+        items='[{"key":"1","val":"Berlin station1"},{"key":"2","val":"Berlin station2"},{"key":"3","val":"Berlin station3"},{"key":"4","val":"Berlin station4"}]'>
+      </px-dropdown-content>
+    </px-dropdown>
+
+
+        <iron-ajax id="assetAjax"
+                 url$="[[samplesUrl]]"
+                 handle-as="json"
+                 on-error="onError"
+                 on-response="onResponse"
+                 last-response="{{assetData}}"
+                 method="Get"
+                 >
+    </iron-ajax>
+    <div>
+        <h1 style="color: #5e9ca0 ;">Welcome EV Owner</h1>
+        <p>Available Stations near by:</p>
+        <table class="editorDemoTable">
+        <thead>
+        <tr>
+        <td>Name of the station</td>
+        <td>Location</td>
+        <td>Available Ports&nbsp;</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>Berlin Station 1</td>
+        <td>52.5200&deg; N, 13.4050&deg; E</td>
+        <td>&nbsp;2</td>
+        </tr>
+        <tr>
+        <td>Berlin Sation 2</td>
+        <td>52.7800&deg; N, 13.4823&deg; E</td>
+        <td>1</td>
+        </tr>
+        </tbody>
+        </table>
+        <p><strong>&nbsp;</strong></p>
+        <p>Have a nice time :)</p>
+    </div>
+<!--     <iron-ajax id="aboutContentAjaxEl" handle-as="text"></iron-ajax>
+ -->  </template>
+  <script>
+    Polymer({
+      is: 'info-view',
+      properties: {
+          station: {
+          type: Object,
+          observer: '_stationChanged'
+        },
+         assetData: {
+          type: Array,
+        }
+      },
+      ready: function() {
+        var that = this;
+        // this.$.aboutContentAjaxEl.url = "/docs";
+/*
+        this.$.aboutContentAjaxEl.addEventListener('response', function(evt) {
+          that.$.aboutContentMarkdown.markdown = evt.detail.response;
+        });*/
+        this.$.Dropdown.addEventListener('px-dropdown-value-changed', function(evt){
+          if (evt.detail.key && evt.detail.key !== "") {
+            console.log("evt ",evt.detail.key );
+          }
+          
+        });
+
+        this.$.aboutContentAjaxEl.generateRequest();
+      }
+    });
+  </script>
+</dom-module>
