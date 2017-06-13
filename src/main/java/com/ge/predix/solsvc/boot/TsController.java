@@ -51,6 +51,7 @@ public class TsController {
 	@RequestMapping(value = "/chargingPointInfo", produces="application/json")
 	public JSONObject getChargingPointInfo(@ModelAttribute("tag") String tag){
 		JSONObject result = new JSONObject();
+		JSONObject response = new JSONObject();
 		JSONObject body = new JSONObject();
 /*		result.put("name", "");
 		result.put("isAvailable", "");
@@ -67,15 +68,21 @@ public class TsController {
 			headers.set("Predix-Zone-Id", predixZoneIdHeaderValue);
 			HttpEntity<String> entity = new HttpEntity<String>(body.toJSONString(),headers);
 			ResponseEntity<JSONObject> httpResult = restTemplate.exchange("https://time-series-store-predix.run.aws-usw02-pr.ice.predix.io/v1/datapoints/latest", HttpMethod.POST, entity, JSONObject.class);
-			result = httpResult.getBody();
+			response = httpResult.getBody();
 		}
-		catch (Exception eek) {
-			System.out.println("** Exception: "+ eek.getMessage());
+		catch (Exception e) {
+			System.out.println("Exception: "+ e.getMessage());
 		}
+		response.get("values");
 		
 		return result;
 		
 	}
+	
+/*	public String getValueFromLatest(JSONObject obj){
+		String value;
+		obj.get("tags");
+	}*/
 	
 	// !!! should be moved to a security config classz
 	private String getAccessToken() {
